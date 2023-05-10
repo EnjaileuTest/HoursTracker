@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="style.css" rel="stylesheet">
+    </head>
+    <body>
+        <img src = "R:/MenhirFX_ressourcesEntreprise/_Logo/GRADIENT/LOGO_D_FOND_NOIR_MENHIRFX.png", class="img">   
+        <h3 id="hello"></h3>
+        <div id="display hours">
+            <h4 id="week"></h4>
+            <div id="donnees"></div>
+        </div>
+
+        <script id="table">
+
+            function loadJSFile(filename, callback) {
+                var script = document.createElement("script");
+                script.type = "text/javascript";
+                script.src = filename;
+                script.onload = callback;
+                document.head.appendChild(script);
+            }
+
+            // Load the 'hours.js' file
+            loadJSFile("hours.js", function() {
+                var tbl = createTable();
+                var donnees = document.getElementById("donnees");
+                donnees.appendChild(tbl);
+            });
+            
+            function createTable(){
+            /*
+            Create a table according the json file ressource
+            return the table
+            */
+                
+                var json_data = JSON.parse(data);
+                console.log(data)
+
+                // user
+                user = json_data['user_id'];
+                document.getElementById("hello").innerHTML = "Hello " + user + " !";
+
+                // week
+                week_nb = json_data['week'];
+                year = json_data['year'];
+                text = "Here is the summary of your work for week " + week_nb + " of " + year + ".";
+                document.getElementById("week").innerHTML = text;
+
+                // containers
+                var tbl = document.createElement("table");
+                var tblBody = document.createElement("tbody");
+
+                // creating all cells
+                var header_row = document.createElement('tr')
+                var session_row = document.createElement('tr')
+                var donnees = document.getElementById("donnees");
+
+                // each day, create a column
+                for (var i = 0; i < json_data.days.length; i++) {
+                    var col = document.createElement('th')
+                    var date = json_data.days[i].date
+                    var cellText = document.createTextNode(date);
+                    col.appendChild(cellText);
+                    header_row.appendChild(col)
+                    var session_data = document.createElement('td')
+
+                    // for each project, create a cell
+                    for(var j = 0; j < json_data.days[i].projects.length; j++){
+                        var row = document.createElement('tr')
+                        row.setAttribute("class", "session_row")
+                        var cell = document.createElement('td')
+                        cell.setAttribute("class", "cell")
+
+                        var title = document.createElement('td')
+                        title.setAttribute("class", "session_title")
+                        var project = json_data.days[i].projects[j].project_name
+                        var project_text = document.createTextNode(project);
+
+                        title.appendChild(project_text)
+                        cell.appendChild(title)
+                        
+                        // for each asset, create infos
+                        for(var k = 0; k < json_data.days[i].projects[j].project_sessions.length; k++){
+                            var infos = document.createElement('td');
+                            infos.setAttribute('class', 'info');
+                            var total = json_data.days[i].projects[j].project_sessions[k].total_time 
+                            var asset_name = json_data.days[i].projects[j].project_sessions[k].asset_name
+                            var department = json_data.days[i].projects[j].project_sessions[k].department
+                        
+                            var total_text = document.createTextNode(total);
+                            var asset_text = document.createTextNode(asset_name + '  ' + department + ' : ' + total);
+                            var br1 = document.createElement("br");
+                            var br2 = document.createElement("br");
+                            var br3 = document.createElement("br");
+
+                            infos.appendChild(asset_text)
+
+                            // complete cell
+                            cell.appendChild(infos)
+                        }
+
+                        // append cell in row
+                        row.appendChild(cell)
+                        session_data.appendChild(row);
+                        session_row.appendChild(session_data)
+                    } 
+                    
+                    // append containers in containers
+
+                    tblBody.appendChild(header_row);
+                    tblBody.appendChild(session_row);
+                    tbl.appendChild(tblBody);
+
+                    
+                }
+                return tbl
+            
+            }
+            
+            /* // get the table, append it in div "donnees"
+            var tbl = createTable()
+            donnees.appendChild(tbl)
+            // append donnees in body
+            var body = document.getElementsByTagName("body")[0];
+            body.appendChild(donnees); */
+
+
+        </script>
+
+        <div id="chooseWeek">
+            <h4>Display another week :</h4>
+            <div class="colonne">
+                <select id="weekSelect" name="weekSelect">
+                    <option value="hours.js">Current week</option>
+                </select>
+            </div>
+        </div>
+
+        
+        <script src = "backups.js" type='text/javascript' ></script>
+        <script>
+            var json_data = JSON.parse(data);
+
+            for(var i = 0; i < json_data.backups.length; i++){
+                // get data
+                bckp = json_data.backups[i]
+                var opText = bckp.year + " Week " + bckp.week
+                var opValue = bckp.path
+
+                // add option
+                select = document.getElementById("weekSelect")
+                var option = document.createElement("option");
+                option.text = opText
+                option.value = opValue
+
+                select.add(option)
+            }
+
+            async function rechargerScript(newSrc) {
+            console.log(newSrc);
+
+            // Sélectionner la balise script que vous voulez recharger
+            var scriptTag = document.getElementById('source');
+            if (!scriptTag) {
+                console.error('Erreur : Impossible de trouver la balise script à recharger.');
+                return;
+            }
+
+            // Créer une nouvelle balise script avec la nouvelle source
+            var newScriptTag = await document.createElement('script');
+            newScriptTag.src = newSrc;
+            newScriptTag.id = "source";
+            newScriptTag.type='text/javascript';
+
+            // Remplacer l'ancienne balise script par la nouvelle
+            if (!scriptTag.parentNode) {
+                console.error('Erreur : Impossible de trouver le parent de la balise script à recharger.');
+                return;
+            }
+            await scriptTag.parentNode.replaceChild(newScriptTag, scriptTag);
+
+            console.log('La balise script a été rechargée avec succès.');
+
+            }
+
+
+            function refresh(){
+                var donneesDiv = document.getElementById('donnees')
+                donneesDiv.removeChild(donneesDiv.firstChild)
+                var newTable = createTable()
+                donneesDiv.appendChild(newTable)
+            }
+
+            select = document.getElementById("weekSelect");
+            select.addEventListener("change", function() {
+                var url = select.value;
+                loadJSFile(url, function() {
+                    refresh();
+                });
+            });
+
+        </script>
+
+
+    </body>
+</html>
