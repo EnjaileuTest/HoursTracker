@@ -108,6 +108,7 @@
                             var infos = document.createElement('td');
                             infos.setAttribute('class', 'info');
                             var total = json_data.days[i].projects[j].project_sessions[k].total_time 
+                            total = reformat_hours(total)
                             var asset_name = json_data.days[i].projects[j].project_sessions[k].asset_name
                             var department = json_data.days[i].projects[j].project_sessions[k].department
                         
@@ -139,6 +140,11 @@
                 }
                 return tbl
             
+            }
+
+            function reformat_hours(hours){
+                s = hours.split(":")
+                return s[0] + "h " + s[1];
             }
             
         </script>

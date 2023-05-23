@@ -239,7 +239,7 @@ class Prism_HoursTrackerV2_Functions(object):
 
     def get_date_as_datetime_obj(self, date_string):
         '''
-        Converts a string object representing a date, like this %d/%m/%y, to a datetime object
+        Converts a string object representing a date, like this %d/%m/%y to a datetime object
 
         :param date_string: string
         returns: datetime
@@ -249,7 +249,7 @@ class Prism_HoursTrackerV2_Functions(object):
 
     def get_time_as_datetime_obj(self, time_string):
         '''
-        Converts a string object representing a date, like this %d/%m/%y, to a datetime object
+        Converts a string object representing a date, like this '%H:%M:%S' or this to a datetime object
         
         :param time_string: string
         returns: datetime
@@ -428,13 +428,11 @@ class Prism_HoursTrackerV2_Functions(object):
         :return: dict
         '''
         path = str(path)
-        self.log(f"path = {path}")
         try:
             # Open user json data and laod it to data
             with open(path, 'r') as json_file:
                 try:
                     raw_data = json_file.read()
-                    self.log(f"raw data = {raw_data}")
                 except Exception as e:
                     self.log(traceback.format_exc())
                 data = json.loads(raw_data)
@@ -630,6 +628,10 @@ class Prism_HoursTrackerV2_Functions(object):
 
 #pragma region timer
     def timer_finished(self):
+        '''
+        Reset last opened asset
+        Write in last.json
+        '''
         self.log('timer finished!')
         data_last ={
         "last_active_project": "",
@@ -640,24 +642,40 @@ class Prism_HoursTrackerV2_Functions(object):
         
         json_obj = json.dumps(data_last, indent=4)
         self.write_to_file(json_obj, self.user_last_json)
-
-        #self.core.popup('Timer finished!')
         
     def is_timer_running(self):
+        '''
+        Return if the timer is running
+
+        :return: bool
+        '''
         return self.t_timer and self.t_timer.is_alive()
 
     def run_timer(self):
+        '''
+        Initialise new timer
+        start timer
+        '''
         self.log('timer run')
         self.t_timer = threading.Timer(120, self.timer_finished)
         self.t_timer.start()
     
     def cancel_timer(self):
+        '''
+        Cancel the timer
+        Wait for it to finish task 
+        '''
         self.log('timer cancel')
         if self.t_timer:
             self.t_timer.cancel()
             self.t_timer.join()
 
     def reset_timer(self):
+        '''
+        Reset the timer
+        If it is already running, cancel it before
+        Then run the timer 
+        '''
         if self.is_timer_running():
             self.cancel_timer()
         self.run_timer()
@@ -674,7 +692,10 @@ class Prism_HoursTrackerV2_Functions(object):
 # LOGIC
     def create_data(self, entity={}):
         """
-        
+        Initialise data that goes in hours.json and hours.js
+        Write all the data in the files
+
+        :param entity: dict
         """
         if 'noUI' not in self.core.prismArgs:
             try:
@@ -690,18 +711,14 @@ class Prism_HoursTrackerV2_Functions(object):
                 # Get data from file
                 try:
                     # Open user json data and laod it to data
-                    self.log("Open user json data and laod it to data")
                     data = self.get_data(self.user_data_json)
-                    self.log(f"data = {data}")
                 except:
                     # If json file empty return empty dict/json object
                     data = {}
                 
                 # Get data_last from file
                 try:
-                    self.log("Get data_last from file")
                     data_last = self.get_data(self.user_last_json)
-                    self.log(f"data last = {data_last}")
                 except:
                     data_last = {}
 
@@ -766,9 +783,17 @@ class Prism_HoursTrackerV2_Functions(object):
             except Exception as e:
                 self.log(traceback.format_exc())
 
-            self.log('done')
+            self.log('done create data')
 
     def update_data(self, entity):
+        '''
+        Get data from hours.js and last.json
+        If current asset is not last opened asset : create new data
+        Change data according the entity currently open
+        Write in hours.json, hours.js, last.json and last.js
+
+        :param entity: dict
+        '''
 
         if 'noUI' not in self.core.prismArgs:
 
@@ -818,8 +843,6 @@ class Prism_HoursTrackerV2_Functions(object):
                                                 delta_tt = timedelta(hours=tt.hour, minutes=tt.minute, seconds=tt.second)
                                                 total_time += delta_tt
                                             ps['total_time'] = str(total_time)
-
-                                            self.log('session updated')
                                             break
 
                     # Write data to file
@@ -851,7 +874,7 @@ class Prism_HoursTrackerV2_Functions(object):
         if args[0] and self.is_disk_allowed(args[0]):
             entity = self.get_entity()
             if entity:
-                self.reset_timer()
+                #self.reset_timer()
                 self.create_data(entity)
 
             else:   
@@ -861,7 +884,7 @@ class Prism_HoursTrackerV2_Functions(object):
         self.log("scene saved")
         entity = self.get_entity()
         if entity:
-            self.reset_timer()
+            #self.reset_timer()
             self.update_data(entity)
         else:            
             self.log(f"entity empty")
@@ -897,7 +920,7 @@ class Prism_HoursTrackerV2_Functions(object):
         self.log("post_published")
         entity = self.get_entity()
         if entity:
-            self.reset_timer()
+            #self.reset_timer()
             self.update_data(entity)
         else:            
             self.log(f"entity empty")
