@@ -933,3 +933,307 @@ class Prism_HoursTrackerV2_Functions(object):
             self.update_data(entity)
         else:            
             self.log(f"entity empty")
+
+    # onCreateAssetDlgOpen
+    def onCreateAssetDlgOpen():
+        print("Create Asset Dialog Opened")
+
+    # onCreateAssetDlgTypeChanged
+    def onCreateAssetDlgTypeChanged():
+        print("Create Asset Dialog Type Changed")
+
+    # onCreateProjectOpen
+    def onCreateProjectOpen():
+        print("Create Project Opened")
+
+    # postInitialize
+    def postInitialize():
+        print("Post Initialize")
+
+    # getIconPathForFileType
+    def getIconPathForFileType():
+        print("Get Icon Path for File Type")
+
+    # preSaveScene
+    def preSaveScene():
+        print("Pre Save Scene")
+
+    # postSaveScene
+    def postSaveScene():
+        print("Post Save Scene")
+
+    # getScenefilePaths
+    def getScenefilePaths():
+        print("Get Scene File Paths")
+
+    # onPrismSettingsOpen
+    def onPrismSettingsOpen():
+        print("Prism Settings Opened")
+
+    # prismSettings_loadUI
+    def prismSettings_loadUI():
+        print("Prism Settings Load UI")
+
+    # prismSettings_saveSettings
+    def prismSettings_saveSettings():
+        print("Prism Settings Save Settings")
+
+    # onPrismSettingsSave
+    def onPrismSettingsSave():
+        print("Prism Settings Saved")
+
+    # prismSettings_loadSettings
+    def prismSettings_loadSettings():
+        print("Prism Settings Load Settings")
+
+    # trayContextMenuRequested
+    def trayContextMenuRequested():
+        print("Tray Context Menu Requested")
+
+    # trayIconClicked
+    def trayIconClicked():
+        print("Tray Icon Clicked")
+
+    # openTrayContextMenu
+    def openTrayContextMenu():
+        print("Open Tray Context Menu")
+
+    # onProjectSettingsOpen
+    def onProjectSettingsOpen():
+        print("Project Settings Opened")
+
+    # projectSettings_loadUI
+    def projectSettings_loadUI():
+        print("Project Settings Load UI")
+
+    # preProjectSettingsSave
+    def preProjectSettingsSave():
+        print("Pre Project Settings Save")
+
+    # postProjectSettingsSave
+    def postProjectSettingsSave():
+        print("Post Project Settings Save")
+
+    # preProjectSettingsLoad
+    def preProjectSettingsLoad():
+        print("Pre Project Settings Load")
+
+    # postProjectSettingsLoad
+    def postProjectSettingsLoad():
+        print("Post Project Settings Load")
+
+    # onSaveExtendedOpen
+    def onSaveExtendedOpen():
+        print("Save Extended Opened")
+
+    # onGetSaveExtendedDetails
+    def onGetSaveExtendedDetails():
+        print("Get Save Extended Details")
+
+    # onSetProjectStartup
+    def onSetProjectStartup():
+        print("Set Project Startup")
+
+    # onDependencyViewerOpen
+    def onDependencyViewerOpen():
+        print("Dependency Viewer Opened")
+
+    # onShotDlgOpen
+    def onShotDlgOpen():
+        print("Shot Dialog Opened")
+
+    # onEditShotDlgSaved
+    def onEditShotDlgSaved():
+        print("Edit Shot Dialog Saved")
+
+    # onEditShotDlgLoaded
+    def onEditShotDlgLoaded():
+        print("Edit Shot Dialog Loaded")
+
+    # onEntityWidgetCreated
+    def onEntityWidgetCreated():
+        print("Entity Widget Created")
+
+    # onAssetDlgOpen
+    def onAssetDlgOpen():
+        print("Asset Dialog Opened")
+
+    # projectBrowser_getAssetMenu
+    def projectBrowser_getAssetMenu():
+        print("Project Browser Get Asset Menu")
+
+    # projectBrowser_getShotMenu
+    def projectBrowser_getShotMenu():
+        print("Project Browser Get Shot Menu")
+
+    # onMediaBrowserOpen
+    def onMediaBrowserOpen():
+        print("Media Browser Opened")
+
+    # mediaBrowserContextMenuRequested
+    def mediaBrowserContextMenuRequested():
+        print("Media Browser Context Menu Requested")
+
+    # openPBListContextMenu
+    def openPBListContextMenu():
+        print("Open PB List Context Menu")
+
+    # onCreateIdentifierDlgOpen
+    def onCreateIdentifierDlgOpen():
+        print("Create Identifier Dialog Opened")
+
+    # onCreateVersionDlgOpen
+    def onCreateVersionDlgOpen():
+        print("Create Version Dialog Opened")
+
+    # onCreateAovDlgOpen
+    def onCreateAovDlgOpen():
+        print("Create AOV Dialog Opened")
+
+    # onProductBrowserOpen
+    def onProductBrowserOpen():
+        print("Product Browser Opened")
+
+    # productSelectorContextMenuRequested
+    def productSelectorContextMenuRequested():
+        print("Product Selector Context Menu Requested")
+
+    # onCreateProductDlgOpen
+    def onCreateProductDlgOpen():
+        print("Create Product Dialog Opened")
+
+    # productVersionAdded
+    def productVersionAdded():
+        print("Product Version Added")
+
+    # onProjectBrowserStartup
+    def onProjectBrowserStartup():
+        print("Project Browser Startup")
+
+    # onProjectBrowserShow
+    def onProjectBrowserShow():
+        print("Project Browser Show")
+
+    # projectBrowser_loadUI
+    def projectBrowser_loadUI():
+        print("Project Browser Load UI")
+
+    # onProjectBrowserClose
+    def onProjectBrowserClose():
+        print("Project Browser Closed")
+
+    # onProjectBrowserRefreshUI
+    def onProjectBrowserRefreshUI():
+        print("Project Browser Refresh UI")
+
+    # projectBrowserContextMenuRequested
+    def projectBrowserContextMenuRequested():
+        print("Project Browser Context Menu Requested")
+
+    # sceneBrowserContextMenuRequested
+    def sceneBrowserContextMenuRequested():
+        print("Scene Browser Context Menu Requested")
+
+    # openPBFileContextMenu
+    def openPBFileContextMenu():
+        print("Open PB File Context Menu")
+
+    # preLoadPresetScene
+    def preLoadPresetScene():
+        print("Pre Load Preset Scene")
+
+    # postLoadPresetScene
+    def postLoadPresetScene():
+        print("Post Load Preset Scene")
+
+    # onDepartmentDlgOpen
+    def onDepartmentDlgOpen():
+        print("Department Dialog Opened")
+
+    # onTaskDlgOpen
+    def onTaskDlgOpen():
+        print("Task Dialog Opened")
+
+    # onStateManagerOpen
+    def onStateManagerOpen():
+        print("State Manager Opened")
+
+    # onStateManagerClose
+    def onStateManagerClose():
+        print("State Manager Closed")
+
+    # onStateCreated
+    def onStateCreated():
+        print("State Created")
+
+    # onStateDeleted
+    def onStateDeleted():
+        print("State Deleted")
+
+    # onStateManagerShow
+    def onStateManagerShow():
+        print("State Manager Show")
+
+    # preImport
+    def preImport():
+        print("Pre Import")
+
+    # postImport
+    def postImport():
+        print("Post Import")
+
+    # prePlayblast
+    def prePlayblast():
+        print("Pre Playblast")
+
+    # postPlayblast
+    def postPlayblast():
+        print("Post Playblast")
+
+    # postIntegrationAdded
+    def postIntegrationAdded():
+        print("Post Integration Added")
+
+    # onIdentifierCreated
+    def onIdentifierCreated():
+        print("Identifier Created")
+
+    # onVersionCreated
+    def onVersionCreated():
+        print("Version Created")
+
+    # onAovCreated
+    def onAovCreated():
+        print("AOV Created")
+
+    # onPluginsLoaded
+    def onPluginsLoaded():
+        print("Plugins Loaded")
+
+    # pluginLoaded
+    def pluginLoaded():
+        print("Plugin Loaded")
+
+    # onProductCreated
+    def onProductCreated():
+        print("Product Created")
+
+    # onAssetFolderCreated
+    def onAssetFolderCreated():
+        print("Asset Folder Created")
+
+    # onAssetCreated
+    def onAssetCreated():
+        print("Asset Created")
+
+    # onShotCreated
+    def onShotCreated():
+        print("Shot Created")
+
+    # onDepartmentCreated
+    def onDepartmentCreated():
+        print("Department Created")
+
+    # onTaskCreated
+    def onTaskCreated():
+        print("Task Created")

@@ -14,37 +14,291 @@
         <h3 id="hello"></h3>
 
         <div id="chooseWeek">
-            <div>
-                <button type="button" onclick="changeSelect(1)" class="btn"><</button>
-                <select id="weekSelect" name="weekSelect">
-                    <option value="hours.js">Current week</option>
-                </select>
-                <button type="button" onclick="changeSelect(-1)"  class="btn">></button>
-            </div>
+            <button type="button" id="prevMonth" class="btn"><</button>
+            <label for="month"></label>
+            <select id="month">
+                <option value="0">Janvier</option>
+                <option value="1">Février</option>
+                <option value="2">Mars</option>
+                <option value="3">Avril</option>
+                <option value="4">Mai</option>
+                <option value="5">Juin</option>
+                <option value="6">Juillet</option>
+                <option value="7">Août</option>
+                <option value="8">Septembre</option>
+                <option value="9">Octobre</option>
+                <option value="10">Novembre</option>
+                <option value="11">Décembre</option>
+            </select>
+            <input type="number" id="year" min="1900" max="2100">
+            <button type="button" id="nextMonth"class="btn">></button>
         </div>
+        <div id="calendar"></div>
 
         <div id="display hours">
             <h4 id="week"></h4>
             <div id="donnees"></div>
+            <div id="noDataMessage"></div>
         </div>
-          
 
-        <script id="table">
+        <script id="calendarScript">
+            function generateCalendar() {
+                var monthIndex = document.getElementById('month').value;
+                var year = document.getElementById('year').value;
+                var calendarContainer = document.getElementById('calendar');
+            
+                // Vérification de la validité de la date
+                if (year < 1900 || year > 2100) {
+                    calendarContainer.innerHTML = 'Année invalide';
+                    return;
+                }
+            
+                var monthNames = [
+                    'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
+                    'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'
+                ];
+            
+                var date = new Date(year, monthIndex);
+                var month = date.getMonth();
+                var daysInMonth = new Date(year, month + 1, 0).getDate();
+            
+                var calendarHTML = '<table class="calendar"><tbody>';
+                calendarHTML += '<tr><th>Lun</th><th>Mar</th><th>Mer</th><th>Jeu</th><th>Ven</th><th>Sam</th><th>Dim</th></tr>';
+            
+                var currentDate = new Date(year, month, 1);
+                var firstDayIndex = currentDate.getDay();
+                if (firstDayIndex === 0) {
+                    firstDayIndex = 6; // Dimanche (0) est le dernier jour de la semaine dans JavaScript
+                } else {
+                    firstDayIndex--;
+                }
+        
+                var currentDay = 1;
+                var totalCells = 5 * 7; // 5 lignes, 7 jours par semaine
+                var rowInd=0;
+                for (var cell = 0; cell < totalCells; cell++) {
+                    if (cell % 7 === 0) {
+                    calendarHTML += '<tr>';
+                    rowInd++;
+                    } 
+            
+                    if (cell < firstDayIndex || currentDay > daysInMonth) {
+                    calendarHTML += '<td class ="dayCell" id="row-' + rowInd + '-cell-' + (cell % 7) + '" class="calendar"></td>'; // Cellule vide avant le premier jour et après le dernier jour du mois
+                    } else {
+                        var weekIndex = Math.floor((cell + firstDayIndex) / 7);
+                        calendarHTML += '<td  class ="dayCell" id="row-' + rowInd + '-cell-' + (cell % 7) + '" onclick="selectDate(this, ' + currentDay + ')" class="calendar">' + currentDay + '</td>'; // Jour du mois avec événement onclick
+                        currentDay++;
+                    }
+            
+                    if (cell % 7 === 6) {
+                    calendarHTML += '</tr>';
+                    }
+                }
+        
+                calendarHTML += '</tbody></table>';
+        
+                calendarContainer.innerHTML = calendarHTML;
 
-            function loadJSFile(filename, callback) {
+                // Mettre à jour l'écouteur d'événement
+                updateCalendarEventListener();
+            }
+        
+            function loadJSFile(filename, callback){
                 var script = document.createElement("script");
                 script.type = "text/javascript";
                 script.src = filename;
-                script.onload = callback;
+
+                script.onload = function () {
+                    // Appel du callback uniquement si le chargement du fichier est réussi
+                    callback(true);
+                };
+                script.onerror = function() {
+                    var noDataMessage = document.getElementById("noDataMessage");
+                    noDataMessage.textContent = "Pas de données disponibles pour la semaine sélectionnée.";
+                    var donnees = document.getElementById("donnees");
+                    donnees.innerHTML = "";
+                };
+
                 document.head.appendChild(script);
             }
+            
+            function selectDate(cell, day) {
+                var monthIndex = document.getElementById('month').value;
+                var year = document.getElementById('year').value;
+                var month = parseInt(monthIndex) + 1;
+        
+                // afficher l'année:
+                var selectedDate = new Date(year, monthIndex, day);
+                var selectedWeek = getWeekNumber(selectedDate);
+                var selectedYear = selectedDate.getFullYear();
 
-            // Load the 'hours.js' file
-            loadJSFile("hours.js", function() {
-                var tbl = createTable();
-                var donnees = document.getElementById("donnees");
-                donnees.appendChild(tbl);
-            });
+                // Supprime la classe 'selected' de toutes les cellules du calendrier
+                var calendarCells = document.querySelectorAll('#calendar td');
+                calendarCells.forEach(function(cell) {
+                    cell.classList.remove('selected');
+                });
+        
+                // Ajoute la classe 'selected' aux cellules de la ligne sélectionnée
+                var rowIndex = parseInt(cell.id.split('-')[1]);
+                var rowCells = document.querySelectorAll('#calendar td[id^="row-' + rowIndex + '-cell-"]');
+                rowCells.forEach(function (cell) {
+                    cell.classList.add('selected');
+                });
+
+                var url = isCurrentWeek(selectedWeek, selectedYear)
+                    ? "U:/mesDocuments/HoursTrackerV2/hours.js"
+                    : "U:/mesDocuments/HoursTrackerV2/backup/" + selectedWeek + "_" + selectedYear + "_hours.js";
+
+                
+                loadJSFile(url, function(succes) {
+                    if(succes) {
+                        refresh();
+                        updateCalendarEventListener(); // Ajout de l'appel à updateCalendar()
+                        var noDataMessage = document.getElementById("noDataMessage");
+                        noDataMessage.innerHTML = ""; // Effacer le message d'erreur
+                    }else{
+                        var noDataMessage = document.getElementById("noDataMessage");
+                        noDataMessage.innerHTML = "Pas de données disponibles pour la semaine sélectionnée.";
+                        var donnees = document.getElementById("donnees");
+                        donnees.innerHTML = "";
+                    }
+                });
+
+                return{"week": selectedWeek, "year": selectedYear};
+            }
+        
+            function updateCalendarEventListener() {
+                // Écouteur d'événement pour la sélection du mois
+                var monthSelect = document.getElementById('month');
+                monthSelect.addEventListener('change', updateCalendarEventListener);
+
+                // Écouteur d'événement pour la saisie de l'année
+                var yearInput = document.getElementById('year');
+                yearInput.addEventListener('input', updateCalendarEventListener);
+            }
+
+            function isCurrentWeek(week, year) {
+                var currentDate = new Date();
+                var currentWeek = getWeekNumber(currentDate);
+                var currentYear = currentDate.getFullYear();
+
+                return week === currentWeek && year === currentYear;
+            }
+        
+            function getWeekNumber(date) {
+                // Copie de la date pour éviter les modifications indésirables
+                var copiedDate = new Date(date.getTime());
+        
+                // Définition du premier jour de la semaine (lundi)
+                copiedDate.setHours(0, 0, 0, 0);
+                copiedDate.setDate(copiedDate.getDate() + 3 - ((copiedDate.getDay() + 6) % 7));
+        
+                // Définition de la première semaine de l'année
+                var firstWeekOfYear = new Date(copiedDate.getFullYear(), 0, 4);
+        
+                // Calcul du numéro de semaine
+                var weekNumber = Math.round(((copiedDate - firstWeekOfYear) / 86400000 - 3 + ((firstWeekOfYear.getDay() + 6) % 7)) / 7) + 1;
+        
+                return weekNumber;
+            }
+        
+            // Fonction pour afficher le calendrier du mois précédent
+            function showPreviousMonth() {
+                var selectedMonthIndex = parseInt(monthSelect.value);
+                var selectedYear = parseInt(yearInput.value);
+        
+                // Décrémente le mois
+                selectedMonthIndex--;
+                if (selectedMonthIndex < 0) {
+                // Si le mois est inférieur à 0, passe à décembre de l'année précédente
+                selectedMonthIndex = 11; // Décembre
+                selectedYear--;
+                }
+        
+                // Met à jour le select et l'input avec les nouvelles valeurs
+                monthSelect.value = selectedMonthIndex;
+                yearInput.value = selectedYear;
+        
+                // Génère le calendrier pour le mois précédent
+                generateCalendar();
+          }
+        
+            // Fonction pour afficher le calendrier du mois suivant
+            function showNextMonth() {
+                var selectedMonthIndex = parseInt(monthSelect.value);
+                var selectedYear = parseInt(yearInput.value);
+        
+                // Incrémente le mois
+                selectedMonthIndex++;
+                if (selectedMonthIndex > 11) {
+                    // Si le mois est supérieur à 11, passe à janvier de l'année suivante
+                    selectedMonthIndex = 0; // Janvier
+                    selectedYear++;
+                }
+        
+                // Met à jour le select et l'input avec les nouvelles valeurs
+                monthSelect.value = selectedMonthIndex;
+                yearInput.value = selectedYear;
+        
+                // Génère le calendrier pour le mois suivant
+                generateCalendar();
+            }
+        
+            function refresh(){
+                var donneesDiv = document.getElementById('donnees');
+                if (donneesDiv.firstChild) {
+                    donneesDiv.removeChild(donneesDiv.firstChild);
+                }
+                var newTable = createTable();
+                donneesDiv.appendChild(newTable);
+            }
+
+            ////// EVENT ///////
+            // Écouteur d'événement pour la flèche gauche (mois précédent)
+            var prevMonthButton = document.getElementById('prevMonth');
+            prevMonthButton.addEventListener('click', showPreviousMonth);
+        
+            // Écouteur d'événement pour la flèche droite (mois suivant)
+            var nextMonthButton = document.getElementById('nextMonth');
+            nextMonthButton.addEventListener('click', showNextMonth);
+        
+            // Écouteur d'événement pour la sélection du mois
+            var monthSelect = document.getElementById('month');
+            monthSelect.addEventListener('change', updateCalendarEventListener);
+        
+            // Écouteur d'événement pour la saisie de l'année
+            var yearInput = document.getElementById('year');
+            yearInput.addEventListener('input', updateCalendarEventListener);
+        
+            ///// GENERATE /////
+            // Sélection de la semaine actuelle par défaut
+            var currentDate = new Date();
+            var currentWeek = getWeekNumber(currentDate);
+            var currentYear = currentDate.getFullYear();
+
+            // Mise à jour des valeurs du mois et de l'année
+            var monthSelect = document.getElementById('month');
+            var yearInput = document.getElementById('year');
+            monthSelect.value = currentDate.getMonth();
+            yearInput.value = currentYear;
+
+            // Génération du calendrier initial
+            generateCalendar();
+
+            // Sélection de la date actuelle dans le calendrier
+            var currentDay = currentDate.getDate();
+            var calendarCells = document.querySelectorAll('#calendar td');
+            if (calendarCells && calendarCells.length > 0) {
+                calendarCells.forEach(function (cell) {
+                    if (cell.textContent == currentDay) {
+                        selectDate(cell, currentDay);
+                    }
+                });
+            }
+        
+        </script>
+        
+        <script id="tableScript">
             
             function createTable(){
             /*
@@ -53,7 +307,6 @@
             */
                 
                 var json_data = JSON.parse(data);
-                console.log(data)
 
                 // user
                 user = json_data['user_id'];
@@ -63,11 +316,12 @@
                 week_nb = json_data['week'];
                 year = json_data['year'];
                 des = json_data['week_description']
-                text = "Here is the summary of your work for week " + week_nb + " of " + year + " (" + des +").";
+                text = "Here is the summary of your work for week " + week_nb + " of " + year + ".";
                 document.getElementById("week").innerHTML = text;
 
                 // containers
                 var tbl = document.createElement("table");
+                tbl.setAttribute("class", "hours");
                 var tblBody = document.createElement("tbody");
 
                 // creating all cells
@@ -139,6 +393,8 @@
                     
                 }
                 return tbl
+                var noDataMessage = document.getElementById("noDataMessage");
+                noDataMessage.innerHTML= "";
             
             }
 
@@ -147,95 +403,6 @@
                 return s[0] + "h " + s[1];
             }
             
-        </script>
-        
-        <script src = "backups.js" type='text/javascript' ></script>
-        <script>
-            var json_data = JSON.parse(data);
-
-            for(var i = 0; i < json_data.backups.length; i++){
-                // get data
-                bckp = json_data.backups[i]
-                //var opText = bckp.year + " Week " + bckp.week
-                var opText = bckp.week_description
-                var opValue = bckp.path
-
-                // add option
-                select = document.getElementById("weekSelect")
-                var option = document.createElement("option");
-                option.text = opText
-                option.value = opValue
-
-                select.add(option)
-            }
-
-            async function rechargerScript(newSrc) {
-                console.log(newSrc);
-
-                // Sélectionner la balise script que vous voulez recharger
-                var scriptTag = document.getElementById('source');
-                if (!scriptTag) {
-                    console.error('Erreur : Impossible de trouver la balise script à recharger.');
-                    return;
-                }
-
-                // Créer une nouvelle balise script avec la nouvelle source
-                var newScriptTag = await document.createElement('script');
-                newScriptTag.src = newSrc;
-                newScriptTag.id = "source";
-                newScriptTag.type='text/javascript';
-
-                // Remplacer l'ancienne balise script par la nouvelle
-                if (!scriptTag.parentNode) {
-                    console.error('Erreur : Impossible de trouver le parent de la balise script à recharger.');
-                    return;
-                }
-                await scriptTag.parentNode.replaceChild(newScriptTag, scriptTag);
-
-                console.log('La balise script a été rechargée avec succès.');
-
-            }
-
-
-            function refresh(){
-                var donneesDiv = document.getElementById('donnees');
-                donneesDiv.removeChild(donneesDiv.firstChild);
-                var newTable = createTable();
-                donneesDiv.appendChild(newTable);
-            }
-
-            function changeSelect(number){
-                select = document.getElementById("weekSelect");
-                numOptions = select.options.length;
-                console.log(numOptions);
-                nextIndex = select.selectedIndex + number;
-                console.log("nextindex=" + nextIndex);
-
-                var maxIndex = numOptions-1;
-                
-                if (nextIndex>maxIndex){
-                    nextIndex = maxIndex;
-                }
-                else if (nextIndex<0){
-                    nextIndex = 0;
-                }
-
-                select.selectedIndex = nextIndex;
-                var url = select.value;
-                loadJSFile(url, function() {
-                    refresh();
-                });
-
-            }
-            
-            select = document.getElementById("weekSelect");
-            select.addEventListener("change", function() {
-                var url = select.value;
-                loadJSFile(url, function() {
-                    refresh();
-                });
-            });
-
         </script>
 
 
