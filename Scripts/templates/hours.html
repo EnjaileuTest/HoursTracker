@@ -33,16 +33,21 @@
             <input type="number" id="year" min="1900" max="2100">
             <button type="button" id="nextMonth"class="btn">></button>
         </div>
-        <div id="calendar"></div>
+        <div id="calendarBlock">
+            <button type="button" id="prevWeek" class="btn"><</button>
+            <div id="calendar"></div>
+            <button type="button" id="nextWeek" class="btn">></button>
+        </div>
 
         <div id="display hours">
-            <h4 id="week"></h4>
+            <h4 id="week">Here is the summary of your work for week <span id="weekNumber"></span> of <span id="yearNumber"></span>.</h4>
             <div id="donnees"></div>
             <div id="noDataMessage"></div>
         </div>
 
         <script id="calendarScript">
             function generateCalendar() {
+
                 var monthIndex = document.getElementById('month').value;
                 var year = document.getElementById('year').value;
                 var calendarContainer = document.getElementById('calendar');
@@ -52,11 +57,6 @@
                     calendarContainer.innerHTML = 'Année invalide';
                     return;
                 }
-            
-                var monthNames = [
-                    'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
-                    'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'
-                ];
             
                 var date = new Date(year, monthIndex);
                 var month = date.getMonth();
@@ -113,10 +113,17 @@
                     callback(true);
                 };
                 script.onerror = function() {
+                    // no data message
                     var noDataMessage = document.getElementById("noDataMessage");
                     noDataMessage.textContent = "Pas de données disponibles pour la semaine sélectionnée.";
                     var donnees = document.getElementById("donnees");
                     donnees.innerHTML = "";
+
+                    // h4 text
+                    week_nb = filename.split("/")[4].split("_")[0]
+                    document.getElementById("weekNumber").innerHTML=week_nb;
+                    year_nb = filename.split("/")[4].split("_")[1]
+                    document.getElementById("yearNumber").innerHTML=year_nb;
                 };
 
                 document.head.appendChild(script);
@@ -132,19 +139,10 @@
                 var selectedWeek = getWeekNumber(selectedDate);
                 var selectedYear = selectedDate.getFullYear();
 
-                // Supprime la classe 'selected' de toutes les cellules du calendrier
-                var calendarCells = document.querySelectorAll('#calendar td');
-                calendarCells.forEach(function(cell) {
-                    cell.classList.remove('selected');
-                });
-        
-                // Ajoute la classe 'selected' aux cellules de la ligne sélectionnée
-                var rowIndex = parseInt(cell.id.split('-')[1]);
-                var rowCells = document.querySelectorAll('#calendar td[id^="row-' + rowIndex + '-cell-"]');
-                rowCells.forEach(function (cell) {
-                    cell.classList.add('selected');
-                });
+                // select correct row
+                selectRow(parseInt(cell.id.split('-')[1]));
 
+                // load table
                 var url = isCurrentWeek(selectedWeek, selectedYear)
                     ? "U:/mesDocuments/HoursTrackerV2/hours.js"
                     : "U:/mesDocuments/HoursTrackerV2/backup/" + selectedWeek + "_" + selectedYear + "_hours.js";
@@ -163,7 +161,7 @@
                         donnees.innerHTML = "";
                     }
                 });
-
+                
                 return{"week": selectedWeek, "year": selectedYear};
             }
         
@@ -175,6 +173,10 @@
                 // Écouteur d'événement pour la saisie de l'année
                 var yearInput = document.getElementById('year');
                 yearInput.addEventListener('input', updateCalendarEventListener);
+            }
+
+            function updateCalendar(){
+                generateCalendar();
             }
 
             function isCurrentWeek(week, year) {
@@ -220,7 +222,13 @@
                 yearInput.value = selectedYear;
         
                 // Génère le calendrier pour le mois précédent
-                generateCalendar();
+                updateCalendar();
+
+                // select last row
+                rowCells = selectRow(5);
+
+                // load table
+                loadTable(year, document.getElementById('month').value, rowCells[0].textContent);
           }
         
             // Fonction pour afficher le calendrier du mois suivant
@@ -241,7 +249,13 @@
                 yearInput.value = selectedYear;
         
                 // Génère le calendrier pour le mois suivant
-                generateCalendar();
+                updateCalendar();
+
+                // select first row
+                rowCells = selectRow(1);
+
+                // load table
+                loadTable(year, document.getElementById('month').value, rowCells[0].textContent);
             }
         
             function refresh(){
@@ -253,6 +267,109 @@
                 donneesDiv.appendChild(newTable);
             }
 
+            function showPreviousWeek(){
+                year = parseInt(document.getElementById('yearNumber').textContent)
+                week = parseInt(document.getElementById('weekNumber').textContent)
+                
+                selectedCells = document.querySelectorAll('#calendar td.selected');
+                currentRow = parseInt(selectedCells[0].id.split('-')[1]);
+
+                if(currentRow <=1){
+                    document.getElementById('month').value -= 1;
+                    if(document.getElementById('month').value <= 0){
+                        document.getElementById('month').value = 11;
+                        document.getElementById('year').value = year - 1;
+                    }
+                }
+
+                updateCalendarEventListener();
+                updateCalendar();
+
+                // Ajoute la classe 'selected' aux cellules de la ligne sélectionnée
+                rowIndex = currentRow - 1;
+                if (rowIndex < 1) {
+                    rowIndex = 5;
+                }
+                rowCells = selectRow(rowIndex);
+
+                // load table
+                loadTable(year, document.getElementById('month').value, rowCells[0].textContent);
+                
+            }
+
+            function showNextWeek(){
+                year = parseInt(document.getElementById('yearNumber').textContent)
+                week = parseInt(document.getElementById('weekNumber').textContent)
+                
+                selectedCells = document.querySelectorAll('#calendar td.selected');
+                currentRow = parseInt(selectedCells[0].id.split('-')[1]);
+
+                if(currentRow >=5){
+                    index = document.getElementById('month').value;
+                    index ++;
+                    document.getElementById('month').value = index;
+                    if(index >= 12){
+                        document.getElementById('month').value = 0;
+                        document.getElementById('year').value = year + 1;
+                    }
+                }
+
+                updateCalendarEventListener();
+                updateCalendar();
+
+                // Ajoute la classe 'selected' aux cellules de la ligne sélectionnée
+                rowIndex = currentRow + 1;
+                if (rowIndex > 5) {
+                    rowIndex = 1;
+                }
+                rowCells = selectRow(rowIndex);
+
+                // load table
+                loadTable(year, document.getElementById('month').value, rowCells[0].textContent);
+            }
+
+            function selectRow(rowIndex){
+                // Supprime la classe 'selected' de toutes les cellules du calendrier
+                var calendarCells = document.querySelectorAll('#calendar td');
+                calendarCells.forEach(function(cell) {
+                    cell.classList.remove('selected');
+                });
+
+                // Ajoute la classe 'selected' aux cellules de la ligne sélectionnée
+                var rowCells = document.querySelectorAll('#calendar td[id^="row-' + rowIndex + '-cell-"]');
+                rowCells.forEach(function (cell) {
+                    cell.classList.add('selected');
+                });
+
+                return rowCells
+            }
+
+            function loadTable(year, month, day){
+                date = new Date(year, month, day)
+                selectedWeek = getWeekNumber(date);
+                selectedYear = parseInt(document.getElementById('year').value)
+                
+                var url = isCurrentWeek(selectedWeek, selectedYear)
+                    ? "U:/mesDocuments/HoursTrackerV2/hours.js"
+                    : "U:/mesDocuments/HoursTrackerV2/backup/" + selectedWeek + "_" + selectedYear + "_hours.js";
+
+                
+                loadJSFile(url, function(succes) {
+                    if(succes) {
+                        refresh();
+                        updateCalendarEventListener(); // Ajout de l'appel à updateCalendar()
+                        var noDataMessage = document.getElementById("noDataMessage");
+                        noDataMessage.innerHTML = ""; // Effacer le message d'erreur
+                    }else{
+                        var noDataMessage = document.getElementById("noDataMessage");
+                        noDataMessage.innerHTML = "Pas de données disponibles pour la semaine sélectionnée.";
+                        var donnees = document.getElementById("donnees");
+                        donnees.innerHTML = "";
+                    }
+                });
+
+            }
+            
             ////// EVENT ///////
             // Écouteur d'événement pour la flèche gauche (mois précédent)
             var prevMonthButton = document.getElementById('prevMonth');
@@ -265,11 +382,21 @@
             // Écouteur d'événement pour la sélection du mois
             var monthSelect = document.getElementById('month');
             monthSelect.addEventListener('change', updateCalendarEventListener);
+            monthSelect.addEventListener('change', updateCalendar);
         
             // Écouteur d'événement pour la saisie de l'année
             var yearInput = document.getElementById('year');
             yearInput.addEventListener('input', updateCalendarEventListener);
-        
+            yearInput.addEventListener('input', updateCalendar);
+
+            // Ecouteur d'evenement bouton prevWeek
+            var prevWeekButton = document.getElementById('prevWeek');
+            prevWeekButton.addEventListener('click', showPreviousWeek);
+
+            // Ecouteur d'evenement bouton nextWeek
+            var prevWeekButton = document.getElementById('nextWeek');
+            prevWeekButton.addEventListener('click', showNextWeek);
+                    
             ///// GENERATE /////
             // Sélection de la semaine actuelle par défaut
             var currentDate = new Date();
@@ -294,8 +421,7 @@
                         selectDate(cell, currentDay);
                     }
                 });
-            }
-        
+            }        
         </script>
         
         <script id="tableScript">
@@ -315,9 +441,8 @@
                 // week
                 week_nb = json_data['week'];
                 year = json_data['year'];
-                des = json_data['week_description']
-                text = "Here is the summary of your work for week " + week_nb + " of " + year + ".";
-                document.getElementById("week").innerHTML = text;
+                document.getElementById("weekNumber").innerHTML = week_nb;
+                document.getElementById("yearNumber").innerHTML = year;
 
                 // containers
                 var tbl = document.createElement("table");
@@ -344,6 +469,7 @@
 
                     // for each project, create a cell
                     for(var j = 0; j < json_data.days[i].projects.length; j++){
+                        var total_project = new Date("1970-01-01T00:00:00Z").getTime()
                         var row = document.createElement('tr')
                         row.setAttribute("class", "session_row")
                         var cell = document.createElement('td')
@@ -361,27 +487,39 @@
                         for(var k = 0; k < json_data.days[i].projects[j].project_sessions.length; k++){
                             var infos = document.createElement('td');
                             infos.setAttribute('class', 'info');
-                            var total = json_data.days[i].projects[j].project_sessions[k].total_time 
-                            total = reformat_hours(total)
-                            var asset_name = json_data.days[i].projects[j].project_sessions[k].asset_name
-                            var department = json_data.days[i].projects[j].project_sessions[k].department
+                            var total = json_data.days[i].projects[j].project_sessions[k].total_time;
+                            if(total.split(":")[0].length <= 1){
+                                total = "0"+total
+                            }
+                            total_date = new Date("1970-01-01T" + total + "Z").getTime();
+                            total_project += total_date;
+                            total = reformat_hours(total);
+                            var asset_name = json_data.days[i].projects[j].project_sessions[k].asset_name;
+                            var department = json_data.days[i].projects[j].project_sessions[k].department;
                         
                             var total_text = document.createTextNode(total);
                             var asset_text = document.createTextNode(asset_name + '  ' + department + ' : ' + total);
-                            var br1 = document.createElement("br");
-                            var br2 = document.createElement("br");
-                            var br3 = document.createElement("br");
 
                             infos.appendChild(asset_text)
 
                             // complete cell
                             cell.appendChild(infos)
                         }
+                        var resultDate = new Date(total_project);
+                        var hours = resultDate.getUTCHours().toString().padStart(2, "0");
+                        var minutes = resultDate.getUTCMinutes().toString().padStart(2, "0");
+                        var seconds = resultDate.getUTCSeconds().toString().padStart(2, "0");
+
+                        var total_project_block = document.createElement('td');
+                        total_project_block.setAttribute('class', 'info-total');
+                        var total_project_text = document.createTextNode(reformat_hours(hours + ":" + minutes + ":" + seconds));
+                        total_project_block.appendChild(total_project_text);
+                        cell.appendChild(total_project_block);
 
                         // append cell in row
-                        row.appendChild(cell)
+                        row.appendChild(cell);
                         session_data.appendChild(row);
-                        session_row.appendChild(session_data)
+                        session_row.appendChild(session_data);
                     } 
                     
                     // append containers in containers

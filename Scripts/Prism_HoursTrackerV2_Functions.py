@@ -146,10 +146,8 @@ class Prism_HoursTrackerV2_Functions(object):
         :param path: path of the file
         :return: bool
         '''
-        
-        if path[0] == 'C':
-            return False
-        return True
+        not_allowed = ["C", "T"]
+        return path[0] not in not_allowed
 
 #pragma region initialise
 

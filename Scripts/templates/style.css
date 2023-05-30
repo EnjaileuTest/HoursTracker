@@ -1,14 +1,135 @@
+/* PAGE */
 html {
   font-family: 'helvetica neue', helvetica, arial, sans-serif;
   background-color: rgb(21, 21, 21);
   word-break: break-all;
+  user-select: none;
 }
 
 body {
   color: white;
 }
 
-table {
+.img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 7%;
+}
+
+h3 {
+  text-align: center;
+}
+
+h4{
+  margin-left: 15px;
+}
+/* CHOOSE WEEK */
+
+#chooseWeek {
+  text-align: center;
+}
+
+#prevMonth,
+#nextMonth {
+  cursor: pointer;
+  font-size: 13px;
+  margin: 0 5px;
+  padding: 5px 8px;
+}
+
+#prevWeek,
+#nextWeek{
+  cursor: pointer;
+  font-size: 13px;
+  margin: 0 15px;
+  padding: 15px 10px;
+}
+
+.btn{
+  background-color: rgba(80, 80, 80, 1);
+  color: white;
+
+  border: 0px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.btn:hover {
+  background-color: rgba(236, 68, 60, 1);
+}
+
+input{
+  background-color: rgba(80, 80, 80, 1);
+  color: white;
+  padding: 6px 8px;
+
+  border: 0px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+input:hover {
+  background-color: rgba(236, 68, 60, 1);
+}
+
+select{
+  background-color: rgba(80, 80, 80, 1);
+  color: white;
+  padding: 5px 8px;
+
+  border: 0px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+select:hover {
+  background-color: rgba(236, 68, 60, 1);
+}
+
+/* CALENDAR */
+#calendarBlock{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+table.calendar{
+  table-layout: fixed;
+  text-align: center;
+  border-collapse: collapse;
+  margin-top: 10px;
+
+  border-radius: 10px;
+  overflow: hidden;
+  user-select: none;
+}
+.calendar td.dayCell, 
+.calendar th {
+  padding: 10px;
+  text-align: center;
+  cursor: pointer;
+  border: 2px solid rgb(45, 45, 45);
+}
+.calendar th {
+  background-color:  rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 2px solid rgb(45, 45, 45);
+}
+
+.calendar td:not(:empty):hover {
+  background-color: rgba(80, 80, 80, 1);
+}
+.dayCell{
+  border: 2px solid rgb(45, 45, 45);
+}
+
+.selected{
+  background-color: rgba(236, 68, 60, 1);
+  color: white
+}
+/* HOURS */
+
+table.hours{
   table-layout: fixed;
   width:100%;
   color: white;
@@ -18,6 +139,7 @@ table {
   border-color: white;
 
   border-spacing: 10px 0px;
+  margin: auto;
 }
 
 .date_row{
@@ -70,41 +192,11 @@ table {
   text-align: right;
 }
 
-.img {
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-  width: 7%;
+.info-total{
+  display : block;
+  color: rgba(255, 250, 250, 0.8);
+  text-align: right;
+  font-weight: 900;
+  text-transform: uppercase;
 }
 
-h3 {
-  text-align: center;
-}
-
-#chooseWeek {
-  text-align: center;
-}
-
-.btn{
-  background-color: rgba(80, 80, 80, 1);
-  color: white;
-  padding: 5px 8px;
-
-  border: 0px;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.btn:hover {
-  background-color: rgba(236, 68, 60, 1);
-}
-
-select{
-  background-color: rgba(80, 80, 80, 1);
-  color: white;
-  padding: 5px 8px;
-
-  border: 0px;
-  border-radius: 5px;
-  cursor: pointer;
-}
